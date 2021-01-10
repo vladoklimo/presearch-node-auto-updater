@@ -71,7 +71,7 @@ function install_presearch_node_updater {
 		Write-Host "Configuring updater - adding your registration code"
 		((Get-Content -path $installFile -Raw) -replace '<PUT-YOUR-PRESEARCH-CODE-HERE>',$presearch_node_registration_code) | Set-Content -Path $installFile
 		
-		$job_action = New-ScheduledTaskAction -Execute $installFile -WorkingDirectory "$installFolder"
+		$job_action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-Command $installFile -NonInteractive" -WorkingDirectory "$installFolder"
 		
 		if ($job_action -eq $null) {
 			Write-Host "Cannot inicialize task action parameter"
