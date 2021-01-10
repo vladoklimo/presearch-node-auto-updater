@@ -25,7 +25,7 @@ $folderName = "presearch_node_updater"
 
 
 $installFolder = "C:\" + $folderName
-$installFile = $installFolder + "\" + "preserach_node_check.ps1"
+$installFile = $installFolder + "\" + "presearch_node_check.ps1"
 
 $githubURL = "https://raw.githubusercontent.com/vladoklimo/presearch-node-auto-updater/main/presearch_node_check.ps1"
 
@@ -71,7 +71,13 @@ function install_presearch_node_updater {
 		Write-Host "Configuring updater - adding your registration code"
 		((Get-Content -path $installFile -Raw) -replace '<PUT-YOUR-PRESEARCH-CODE-HERE>',$presearch_node_registration_code) | Set-Content -Path $installFile
 		
-		$job_action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-Command $installFile -NonInteractive" -WorkingDirectory "$installFolder"
+		$execCmd = $installFile.Replace("\","\\")
+		## create a WScript wrapper otherwise shell window will be flashing to users
+		'WScript.CreateObject("WScript.Shell").Run "powershell -File ' + $execCmd + '", 0, true' | Set-Content -Path $installFolder\runUpdaterScript.vbs
+		
+		## prepare the job action
+		$job_action = New-ScheduledTaskAction -WorkingDirectory $installFolder -Execute "wscript.exe" -Argument "$installFolder\runUpdaterScript.vbs"
+		#$job_action = New-ScheduledTaskAction -WorkingDirectory "$installFolder" -Execute $installFile
 		
 		if ($job_action -eq $null) {
 			Write-Host "Cannot inicialize task action parameter"
