@@ -9,6 +9,9 @@
 ###
 ### Few configuration things before you execute anythng
 ###
+param (
+	[switch]$Force = $false
+)
 
 # name of the folder on C:\ driver, where script download the node updater script
 $folderName = "presearch_node_updater"
@@ -18,6 +21,7 @@ $folderName = "presearch_node_updater"
 ###
 
 ### After this line, edit at your own risk
+
 
 
 $installFolder = "C:\" + $folderName
@@ -41,7 +45,7 @@ function checkFolder {
 
 function install_presearch_node_updater {
 	[CmdletBinding()]
-	param ([boolean]$Force)
+	param ([switch]$Force = $false)
 
 	if ( (checkFolder -folder $installFolder) -and -not($Force) ) {
 		#do some stuff
@@ -61,6 +65,11 @@ function install_presearch_node_updater {
 		Write-Host 'Starting downloading the GitHub Repository'
 		Invoke-RestMethod -Uri $githubURL -OutFile $installFile
 		Write-Host 'Download finished'
+		
+		$presearch_node_registration_code = read-host "Please provide your presearch node registration code"
+		
+		Write-Host "Configuring updater - adding your registration code"
+		((Get-Content -path $installFile -Raw) -replace '<PUT-YOUR-PRESEARCH-CODE-HERE>',$presearch_node_registration_code) | Set-Content -Path $installFile
 		
 		$job_action = New-ScheduledTaskAction -Execute $installFile -WorkingDirectory "$installFolder"
 		
@@ -83,15 +92,18 @@ function install_presearch_node_updater {
 			return
 		}
 		
-		$task = New-ScheduledTask -Action $job_action -Trigger $job_trigger -Settings $job_settings
+		$existingTask = Get-ScheduledTask -TaskName "Presearch Node Auto-Updater"
+		if ($existingTask -ne $null) {
+			Write-Host "Removing previous scheduled task: Presearch Node Auto-Updater"
+			Unregister-ScheduledTask -InputObject $existingTask	-Confirm:$false
+		}
 		
+		$task = New-ScheduledTask -Action $job_action -Trigger $job_trigger -Settings $job_settings
 		if ($task -eq $null) {
 			Write-Host "Cannot inicialize task for registration" 
-			return
 		}
 		
 		$registration = Register-ScheduledTask -TaskName "Presearch Node Auto-Updater" -InputObject $task
-		
 		if ($registration -eq $null) {
 			Write-Host "Cannot register Scheduled task - Presearch Node Auto-Updater" 
 			return
@@ -99,7 +111,8 @@ function install_presearch_node_updater {
 		else {
 			Write-Host "Created recurring task to check presearch node for an updates. Scheduled Task Name: Presearch Node Auto-Updater"
 		}
+		
 	}
 }
 
-install_presearch_node_updater -Force $true
+install_presearch_node_updater -Force:$Force
