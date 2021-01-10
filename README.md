@@ -11,4 +11,4 @@ Set of support scripts to help presearch node community or operators to handle c
 
 # What does the Node Updater Script
 1. Checks docker container logs for version updates
-2. Executes neccessary commands to pull latest presearch/node image and restarts your node accordingly
+2. Executes necessary commands to pull latest presearch/node image and restarts your node accordingly
