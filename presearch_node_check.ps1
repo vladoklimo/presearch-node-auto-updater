@@ -56,3 +56,4 @@ function Check-Presearch-Node-Version {
 }
 
 Check-Presearch-Node-Version
+Exit 
