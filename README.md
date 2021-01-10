@@ -6,7 +6,7 @@ Set of support scripts to help presearch node community or operators to handle c
 2. Execute the script over elevated powershell
 
 		2.a Script downloads the node updater script to location C:\presearch_node_updater
-		2.b Configures the update script which means, stores your Presearch registration code for later usage  
+		2.b Configures the update script meaining stores your Presearch registration code for later usage  
 		2.c Register a recurring Windows Scheduler Task to check for node version updates
 
 # What does the Node Updater Script
