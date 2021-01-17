@@ -26,7 +26,7 @@ $presearch_registration_code = "<PUT-YOUR-PRESEARCH-CODE-HERE>"
 ### After this line, edit at your own risk
 
 function Check-Presearch-Node-Version {
-    $oldNodeIndicator = docker container logs $container_name  --since 10m | Select-String  -Pattern "Node version is too old" -SimpleMatch | measure | % { $_.Count }
+    $oldNodeIndicator = docker container logs $container_name  --since 60m | Select-String  -Pattern "Node version is too old" -SimpleMatch | measure | % { $_.Count }
 	If ($oldNodeIndicator -gt 0) {
 		Write-Host "Checking status: Node version is too old."
 		Write-Host "Stopping the docker $container_name container"
